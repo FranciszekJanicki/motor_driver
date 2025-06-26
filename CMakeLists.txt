@@ -4,10 +4,8 @@ target_sources(motor_driver PRIVATE
     motor_driver.c
 )
 
-target_include_directories(motor_driver PRIVATE
-)
-
-target_link_libraries(motor_driver PRIVATE
+target_include_directories(joint_task PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_options(motor_driver PUBLIC
