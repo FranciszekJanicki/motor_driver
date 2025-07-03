@@ -4,7 +4,7 @@ target_sources(motor_driver PRIVATE
     motor_driver.c
 )
 
-target_include_directories(joint_task PUBLIC
+target_include_directories(motor_driver PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
