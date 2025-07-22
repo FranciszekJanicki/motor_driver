@@ -9,9 +9,10 @@ typedef struct {
     motor_driver_interface_t interface;
 } motor_driver_t;
 
-motor_driver_err_t motor_driver_initialize(motor_driver_t* driver,
-                                           motor_driver_config_t const* config,
-                                           motor_driver_interface_t const* interface);
+motor_driver_err_t motor_driver_initialize(
+    motor_driver_t* driver,
+    motor_driver_config_t const* config,
+    motor_driver_interface_t const* interface);
 motor_driver_err_t motor_driver_deinitialize(motor_driver_t* driver);
 
 motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,

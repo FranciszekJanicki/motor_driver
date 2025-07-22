@@ -4,101 +4,128 @@
 #include <stdio.h>
 #include <string.h>
 
-static motor_driver_err_t motor_driver_motor_initialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_motor_initialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.motor_initialize
-               ? driver->interface.motor_initialize(driver->interface.motor_user)
+               ? driver->interface.motor_initialize(
+                     driver->interface.motor_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_motor_deinitialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_motor_deinitialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.motor_deinitialize
-               ? driver->interface.motor_deinitialize(driver->interface.motor_user)
+               ? driver->interface.motor_deinitialize(
+                     driver->interface.motor_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_motor_set_speed(motor_driver_t const* driver,
-                                                       float32_t speed)
+static motor_driver_err_t motor_driver_motor_set_speed(
+    motor_driver_t const* driver,
+    float32_t speed)
 {
     return driver->interface.motor_set_speed
-               ? driver->interface.motor_set_speed(driver->interface.motor_user, speed)
+               ? driver->interface.motor_set_speed(driver->interface.motor_user,
+                                                   speed)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_encoder_initialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_encoder_initialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.encoder_initialize
-               ? driver->interface.encoder_initialize(driver->interface.encoder_user)
+               ? driver->interface.encoder_initialize(
+                     driver->interface.encoder_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_encoder_deinitialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_encoder_deinitialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.encoder_deinitialize
-               ? driver->interface.encoder_deinitialize(driver->interface.encoder_user)
+               ? driver->interface.encoder_deinitialize(
+                     driver->interface.encoder_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_encoder_get_position(motor_driver_t const* driver,
-                                                            float32_t* position)
+static motor_driver_err_t motor_driver_encoder_get_position(
+    motor_driver_t const* driver,
+    float32_t* position)
 {
     return driver->interface.encoder_get_position
-               ? driver->interface.encoder_get_position(driver->interface.encoder_user, position)
+               ? driver->interface.encoder_get_position(
+                     driver->interface.encoder_user,
+                     position)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_regulator_initialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_regulator_initialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.regulator_initialize
-               ? driver->interface.regulator_initialize(driver->interface.regulator_user)
+               ? driver->interface.regulator_initialize(
+                     driver->interface.regulator_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_regulator_deinitialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_regulator_deinitialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.regulator_deinitialize
-               ? driver->interface.regulator_deinitialize(driver->interface.regulator_user)
+               ? driver->interface.regulator_deinitialize(
+                     driver->interface.regulator_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_regulator_get_control(motor_driver_t const* driver,
-                                                             float32_t error,
-                                                             float32_t* control,
-                                                             float32_t delta_time)
+static motor_driver_err_t motor_driver_regulator_get_control(
+    motor_driver_t const* driver,
+    float32_t error,
+    float32_t* control,
+    float32_t delta_time)
 {
     return driver->interface.regulator_get_control
-               ? driver->interface.regulator_get_control(driver->interface.regulator_user,
-                                                         error,
-                                                         control,
-                                                         delta_time)
+               ? driver->interface.regulator_get_control(
+                     driver->interface.regulator_user,
+                     error,
+                     control,
+                     delta_time)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_fault_initialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_fault_initialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.fault_initialize
-               ? driver->interface.fault_initialize(driver->interface.fault_user)
+               ? driver->interface.fault_initialize(
+                     driver->interface.fault_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_fault_deinitialize(motor_driver_t const* driver)
+static motor_driver_err_t motor_driver_fault_deinitialize(
+    motor_driver_t const* driver)
 {
     return driver->interface.fault_deinitialize
-               ? driver->interface.fault_deinitialize(driver->interface.fault_user)
+               ? driver->interface.fault_deinitialize(
+                     driver->interface.fault_user)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static motor_driver_err_t motor_driver_fault_get_current(motor_driver_t const* driver,
-                                                         float32_t* current)
+static motor_driver_err_t motor_driver_fault_get_current(
+    motor_driver_t const* driver,
+    float32_t* current)
 {
     return driver->interface.fault_get_current
-               ? driver->interface.fault_get_current(driver->interface.fault_user, current)
+               ? driver->interface.fault_get_current(
+                     driver->interface.fault_user,
+                     current)
                : MOTOR_DRIVER_ERR_NULL;
 }
 
-static inline float32_t motor_driver_clamp_position(motor_driver_t const* driver,
-                                                    float32_t position)
+static inline float32_t motor_driver_clamp_position(
+    motor_driver_t const* driver,
+    float32_t position)
 {
     if (position < driver->config.min_position) {
         position = driver->config.min_position;
@@ -109,7 +136,8 @@ static inline float32_t motor_driver_clamp_position(motor_driver_t const* driver
     return position;
 }
 
-static inline float32_t motor_driver_clamp_speed(motor_driver_t const* driver, float32_t speed)
+static inline float32_t motor_driver_clamp_speed(motor_driver_t const* driver,
+                                                 float32_t speed)
 {
     if (speed != 0.0F) {
         if (fabsf(speed) < driver->config.min_speed) {
@@ -122,14 +150,16 @@ static inline float32_t motor_driver_clamp_speed(motor_driver_t const* driver, f
     return speed;
 }
 
-static inline bool motor_driver_has_fault(motor_driver_t const* driver, float32_t current)
+static inline bool motor_driver_has_fault(motor_driver_t const* driver,
+                                          float32_t current)
 {
     return current > driver->config.max_current;
 }
 
-motor_driver_err_t motor_driver_initialize(motor_driver_t* driver,
-                                           motor_driver_config_t const* config,
-                                           motor_driver_interface_t const* interface)
+motor_driver_err_t motor_driver_initialize(
+    motor_driver_t* driver,
+    motor_driver_config_t const* config,
+    motor_driver_interface_t const* interface)
 {
     assert(driver && config && interface);
 
@@ -186,7 +216,10 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
     float32_t error_position = position - measured_position;
 
     float32_t control_speed;
-    err = motor_driver_regulator_get_control(driver, error_position, &control_speed, delta_time);
+    err = motor_driver_regulator_get_control(driver,
+                                             error_position,
+                                             &control_speed,
+                                             delta_time);
     if (err != MOTOR_DRIVER_ERR_OK) {
         return err;
     }

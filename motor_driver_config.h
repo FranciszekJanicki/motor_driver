@@ -41,7 +41,10 @@ typedef struct {
     void* regulator_user;
     motor_driver_err_t (*regulator_initialize)(void*);
     motor_driver_err_t (*regulator_deinitialize)(void*);
-    motor_driver_err_t (*regulator_get_control)(void*, float32_t, float32_t*, float32_t);
+    motor_driver_err_t (*regulator_get_control)(void*,
+                                                float32_t,
+                                                float32_t*,
+                                                float32_t);
 
     void* fault_user;
     motor_driver_err_t (*fault_initialize)(void*);
