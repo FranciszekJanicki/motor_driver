@@ -18,6 +18,7 @@ motor_driver_err_t motor_driver_deinitialize(motor_driver_t* driver);
 motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
                                              float32_t position,
                                              float32_t delta_time,
-                                             float32_t* measurement);
+                                             float32_t* measured_position,
+                                             float32_t* measured_current);
 
 #endif // MOTOR_DRIVER_MOTOR_DRIVER_H
