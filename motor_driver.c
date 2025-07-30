@@ -188,11 +188,10 @@ motor_driver_err_t motor_driver_deinitialize(motor_driver_t* driver)
 
     return err;
 }
-
+    
 motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
                                              float32_t position,
-                                             float32_t delta_time,
-                                             float32_t* measurement)
+                                             float32_t delta_time)
 {
     assert(driver);
 
@@ -228,19 +227,6 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
     err = motor_driver_motor_set_speed(driver, control_speed);
     if (err != MOTOR_DRIVER_ERR_OK) {
         return err;
-    }
-
-    printf("current: %f, position: %f, measured_position: %f, error_position: "
-           "%f, control_speed: "
-           "%f\n\r ",
-           (double)current,
-           (double)position,
-           (double)measured_position,
-           (double)error_position,
-           (double)control_speed);
-
-    if (measurement != NULL) {
-        *measurement = measured_position;
     }
 
     return err;
