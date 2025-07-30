@@ -4,6 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef float float32_t;
 
 typedef enum {
@@ -51,5 +55,9 @@ typedef struct {
     motor_driver_err_t (*fault_deinitialize)(void*);
     motor_driver_err_t (*fault_get_current)(void*, float32_t*);
 } motor_driver_interface_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MOTOR_DRIVER_MOTOR_DRIVER_CONFIG_H

@@ -3,6 +3,10 @@
 
 #include "motor_driver_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     motor_driver_state_t state;
     motor_driver_config_t config;
@@ -19,5 +23,9 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
                                              float32_t position,
                                              float32_t delta_time,
                                              float32_t* measurement);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MOTOR_DRIVER_MOTOR_DRIVER_H
