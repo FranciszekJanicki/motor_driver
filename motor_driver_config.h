@@ -12,9 +12,9 @@ typedef float float32_t;
 
 typedef enum {
     MOTOR_DRIVER_ERR_OK = 0,
-    MOTOR_DRIVER_ERR_FAIL = 1 << 0,
-    MOTOR_DRIVER_ERR_NULL = 1 << 1,
-    MOTOR_DRIVER_ERR_FAULT = 1 << 2,
+    MOTOR_DRIVER_ERR_FAIL,
+    MOTOR_DRIVER_ERR_NULL,
+    MOTOR_DRIVER_ERR_FAULT,
 } motor_driver_err_t;
 
 typedef struct {
