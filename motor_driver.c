@@ -265,12 +265,18 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
         return err;
     }
 
-    printf("Measured position: %f, reference position: %f, control speed: %f, "
-           "delta_time: %f\n\r",
+    printf("measured position: %f, "
+           "reference position: %f, "
+           "error position: %f, "
+           "control speed: %f, "
+           "delta_time: %f, "
+           "current: %f\n\r",
            measured_position,
            position,
+           error_position,
            control_speed,
-           delta_time);
+           delta_time,
+           current);
 
     return MOTOR_DRIVER_ERR_OK;
 }
