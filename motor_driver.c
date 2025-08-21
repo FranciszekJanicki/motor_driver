@@ -224,31 +224,33 @@ motor_driver_err_t motor_driver_deinitialize(motor_driver_t* driver)
 }
 
 motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
-                                             float32_t position,
+                                             float32_t reference_position,
                                              float32_t delta_time)
 {
-    if (driver == NULL) {
+    if (driver == NULL || delta_time <= 0.0F) {
         return MOTOR_DRIVER_ERR_NULL;
     }
 
-    float32_t current;
-    motor_driver_err_t err = motor_driver_fault_get_current(driver, &current);
+    float32_t fault_current;
+    motor_driver_err_t err =
+        motor_driver_fault_get_current(driver, &fault_current);
     if (err != MOTOR_DRIVER_ERR_OK) {
         return err;
     }
 
-    if (motor_driver_has_fault(driver, current)) {
+    if (motor_driver_has_fault(driver, fault_current)) {
         return MOTOR_DRIVER_ERR_FAULT;
     }
 
-    float32_t measured_position;
-    err = motor_driver_encoder_get_position(driver, &measured_position);
+    float32_t measure_position;
+    err = motor_driver_encoder_get_position(driver, &measure_position);
     if (err != MOTOR_DRIVER_ERR_OK) {
         return err;
     }
 
-    position = motor_driver_clamp_position(driver, position);
-    float32_t error_position = position - measured_position;
+    reference_position =
+        motor_driver_clamp_position(driver, reference_position);
+    float32_t error_position = reference_position - measure_position;
 
     float32_t control_speed;
     err = motor_driver_regulator_get_control(driver,
@@ -265,18 +267,23 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
         return err;
     }
 
-    printf("measured position: %f, "
-           "reference position: %f, "
-           "error position: %f, "
-           "control speed: %f, "
-           "delta_time: %f, "
-           "current: %f\n\r",
-           measured_position,
-           position,
-           error_position,
-           control_speed,
-           delta_time,
-           current);
+    driver->state.measure_position = measure_position;
+    driver->state.reference_position = reference_position;
+    driver->state.error_position = error_position;
+    driver->state.control_speed = control_speed;
+    driver->state.fault_current = fault_current;
+
+    return MOTOR_DRIVER_ERR_OK;
+}
+
+motor_driver_err_t motor_driver_get_state(motor_driver_t const* driver,
+                                          motor_driver_state_t* state)
+{
+    if (driver == NULL || state == NULL) {
+        return MOTOR_DRIVER_ERR_NULL;
+    }
+
+    memcpy(state, &driver->state, sizeof(*state));
 
     return MOTOR_DRIVER_ERR_OK;
 }

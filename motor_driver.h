@@ -20,8 +20,11 @@ motor_driver_err_t motor_driver_initialize(
 motor_driver_err_t motor_driver_deinitialize(motor_driver_t* driver);
 
 motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
-                                             float32_t position,
+                                             float32_t reference_position,
                                              float32_t delta_time);
+
+motor_driver_err_t motor_driver_get_state(motor_driver_t const* driver,
+                                          motor_driver_state_t* state);
 
 #ifdef __cplusplus
 }

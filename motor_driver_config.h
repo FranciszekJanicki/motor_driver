@@ -18,9 +18,11 @@ typedef enum {
 } motor_driver_err_t;
 
 typedef struct {
-    float32_t position;
-    float32_t speed;
-    float32_t fault;
+    float32_t measure_position;
+    float32_t reference_position;
+    float32_t error_position;
+    float32_t control_speed;
+    float32_t fault_current;
 } motor_driver_state_t;
 
 typedef struct {
