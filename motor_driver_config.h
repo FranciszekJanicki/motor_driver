@@ -19,18 +19,19 @@ typedef enum {
 
 typedef struct {
     float32_t measure_position;
-    float32_t reference_position;
-    float32_t error_position;
     float32_t control_speed;
     float32_t fault_current;
 } motor_driver_state_t;
 
 typedef struct {
-    float32_t min_position;
-    float32_t max_position;
+    float32_t max_current;
     float32_t max_speed;
     float32_t min_speed;
-    float32_t max_current;
+    float32_t min_position;
+    float32_t max_position;
+    float32_t min_acceleration;
+    float32_t max_acceleration;
+    bool should_wrap_position;
 } motor_driver_config_t;
 
 typedef struct {

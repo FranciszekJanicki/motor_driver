@@ -150,6 +150,36 @@ static inline float32_t motor_driver_clamp_speed(motor_driver_t const* driver,
     return speed;
 }
 
+static inline float32_t motor_driver_clamp_acceleration(
+    motor_driver_t const* driver,
+    float32_t acceleration)
+{
+    if (acceleration != 0.0F) {
+        if (fabsf(acceleration) < driver->config.min_acceleration) {
+            return copysignf(driver->config.min_acceleration, acceleration);
+        } else if (fabsf(acceleration) > driver->config.max_acceleration) {
+            return copysignf(driver->config.max_acceleration, acceleration);
+        }
+    }
+
+    return acceleration;
+}
+
+static inline float32_t motor_driver_wrap_position_error(
+    motor_driver_t const* driver,
+    float32_t error_position,
+    float32_t measured_position)
+{
+    if (measured_position + error_position < driver->config.min_position) {
+        return driver->config.min_position - measured_position;
+    } else if (measured_position + error_position >
+               driver->config.max_position) {
+        return driver->config.max_position - measured_position;
+    }
+
+    return error_position;
+}
+
 static inline bool motor_driver_has_fault(motor_driver_t const* driver,
                                           float32_t current)
 {
@@ -227,8 +257,12 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
                                              float32_t reference_position,
                                              float32_t delta_time)
 {
-    if (driver == NULL || delta_time <= 0.0F) {
+    if (driver == NULL) {
         return MOTOR_DRIVER_ERR_NULL;
+    }
+
+    if (delta_time <= 0.0F) {
+        return MOTOR_DRIVER_ERR_FAIL;
     }
 
     float32_t fault_current;
@@ -250,7 +284,13 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
 
     reference_position =
         motor_driver_clamp_position(driver, reference_position);
+
     float32_t error_position = reference_position - measure_position;
+    // if (driver->config.should_wrap_position) {
+    //     error_position = motor_driver_wrap_position_error(driver,
+    //                                                       error_position,
+    //                                                       measure_position);
+    // }
 
     float32_t control_speed;
     err = motor_driver_regulator_get_control(driver,
@@ -261,15 +301,99 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
         return err;
     }
 
+    // float32_t control_acceleration =
+    //     (control_speed - driver->state.control_speed) / delta_time;
+    // control_acceleration =
+    //     motor_driver_clamp_acceleration(driver, control_acceleration);
+
+    // control_speed =
+    //     driver->state.control_speed + control_acceleration * delta_time;
     control_speed = motor_driver_clamp_speed(driver, control_speed);
+
     err = motor_driver_motor_set_speed(driver, control_speed);
     if (err != MOTOR_DRIVER_ERR_OK) {
         return err;
     }
 
     driver->state.measure_position = measure_position;
-    driver->state.reference_position = reference_position;
-    driver->state.error_position = error_position;
+    driver->state.control_speed = control_speed;
+    driver->state.fault_current = fault_current;
+
+    return MOTOR_DRIVER_ERR_OK;
+}
+
+motor_driver_err_t motor_driver_set_speed(motor_driver_t* driver,
+                                          float32_t reference_speed,
+                                          float32_t delta_time)
+{
+    if (driver == NULL) {
+        return MOTOR_DRIVER_ERR_NULL;
+    }
+
+    if (delta_time <= 0.0F) {
+        return MOTOR_DRIVER_ERR_FAIL;
+    }
+
+    float32_t fault_current;
+    motor_driver_err_t err =
+        motor_driver_fault_get_current(driver, &fault_current);
+    if (err != MOTOR_DRIVER_ERR_OK) {
+        return err;
+    }
+
+    if (motor_driver_has_fault(driver, fault_current)) {
+        return MOTOR_DRIVER_ERR_FAULT;
+    }
+
+    reference_speed = motor_driver_clamp_speed(driver, reference_speed);
+
+    err = motor_driver_motor_set_speed(driver, reference_speed);
+    if (err != MOTOR_DRIVER_ERR_OK) {
+        return err;
+    }
+
+    driver->state.control_speed = reference_speed;
+    driver->state.fault_current = fault_current;
+
+    return MOTOR_DRIVER_ERR_OK;
+}
+
+motor_driver_err_t motor_driver_set_acceleration(
+    motor_driver_t* driver,
+    float32_t reference_acceleration,
+    float32_t delta_time)
+{
+    if (driver == NULL) {
+        return MOTOR_DRIVER_ERR_NULL;
+    }
+
+    if (delta_time <= 0.0F) {
+        return MOTOR_DRIVER_ERR_FAIL;
+    }
+
+    float32_t fault_current;
+    motor_driver_err_t err =
+        motor_driver_fault_get_current(driver, &fault_current);
+    if (err != MOTOR_DRIVER_ERR_OK) {
+        return err;
+    }
+
+    if (motor_driver_has_fault(driver, fault_current)) {
+        return MOTOR_DRIVER_ERR_FAULT;
+    }
+
+    reference_acceleration =
+        motor_driver_clamp_acceleration(driver, reference_acceleration);
+
+    float32_t control_speed =
+        driver->state.control_speed + reference_acceleration * delta_time;
+    control_speed = motor_driver_clamp_speed(driver, control_speed);
+
+    err = motor_driver_motor_set_speed(driver, control_speed);
+    if (err != MOTOR_DRIVER_ERR_OK) {
+        return err;
+    }
+
     driver->state.control_speed = control_speed;
     driver->state.fault_current = fault_current;
 
