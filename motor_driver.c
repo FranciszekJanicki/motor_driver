@@ -301,13 +301,13 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
         return err;
     }
 
-    // float32_t control_acceleration =
-    //     (control_speed - driver->state.control_speed) / delta_time;
-    // control_acceleration =
-    //     motor_driver_clamp_acceleration(driver, control_acceleration);
+    float32_t control_acceleration =
+        (control_speed - driver->state.control_speed) / delta_time;
+    control_acceleration =
+        motor_driver_clamp_acceleration(driver, control_acceleration);
 
-    // control_speed =
-    //     driver->state.control_speed + control_acceleration * delta_time;
+    control_speed =
+        driver->state.control_speed + control_acceleration * delta_time;
     control_speed = motor_driver_clamp_speed(driver, control_speed);
 
     err = motor_driver_motor_set_speed(driver, control_speed);
