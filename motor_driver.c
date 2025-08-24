@@ -286,11 +286,11 @@ motor_driver_err_t motor_driver_set_position(motor_driver_t* driver,
         motor_driver_clamp_position(driver, reference_position);
 
     float32_t error_position = reference_position - measure_position;
-    // if (driver->config.should_wrap_position) {
-    //     error_position = motor_driver_wrap_position_error(driver,
-    //                                                       error_position,
-    //                                                       measure_position);
-    // }
+    if (driver->config.should_wrap_position) {
+        error_position = motor_driver_wrap_position_error(driver,
+                                                          error_position,
+                                                          measure_position);
+    }
 
     float32_t control_speed;
     err = motor_driver_regulator_get_control(driver,
